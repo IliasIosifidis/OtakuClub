@@ -1,0 +1,8 @@
+package com.ilias.otakuclub.ui.search
+
+import androidx.compose.runtime.Composable
+
+@Composable
+fun SearchViewModel(){
+
+}
