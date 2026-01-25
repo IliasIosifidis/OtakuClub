@@ -4,7 +4,6 @@ import androidx.compose.runtime.Composable
 import com.ilias.otakuclub.data.remote.dto.AnimeDetailsDto
 import com.ilias.otakuclub.domain.model.AnimeDetails
 
-@Composable
 fun AnimeDetailsDto.toDomainAnimeDetail(id: Int): AnimeDetails {
 
     val jpg = images?.jpg

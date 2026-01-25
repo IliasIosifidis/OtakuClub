@@ -2,8 +2,12 @@ package com.ilias.otakuclub.data.remote.dto
 
 import com.google.gson.annotations.SerializedName
 
+data class AnimeDetailsResponseDto(
+    val data: AnimeDetailsDto
+)
+
 data class AnimeDetailsDto(
-    val images: AnimeImagesDto? = null,
+    val images: AnimeImagesDto?,
     val trailer: TrailerDto? = null,
     @SerializedName("title_japanese")
     val titleJap: String? = null,
