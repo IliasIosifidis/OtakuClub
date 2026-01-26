@@ -8,7 +8,7 @@ import java.util.concurrent.TimeUnit
 
 object ApiClient {
 
-    private const val BASE_URL = "https://api.jikan.moe.v4/"
+    private const val BASE_URL = "https://api.jikan.moe/v4/"
 
     // That's for logging each step of the API call in Logcat
     private val loggingInterceptor = HttpLoggingInterceptor().apply {

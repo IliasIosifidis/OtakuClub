@@ -1,21 +1,214 @@
 package com.ilias.otakuclub.ui.home
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.lazy.grid.rememberLazyGridState
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Card
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.snapshotFlow
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import com.ilias.otakuclub.domain.model.Anime
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.dp
+import coil3.compose.AsyncImage
+import com.ilias.otakuclub.R
+import kotlinx.coroutines.launch
+
 
 @Composable
 fun HomeScreen(
-    paddingValues: PaddingValues
+    paddingValues: PaddingValues,
+    viewModel: HomeViewModel
 ) {
+    val uiState by viewModel.uiState.collectAsState()
+    val gridState = rememberLazyGridState()
+    val showScrollToTop by remember { derivedStateOf { gridState.firstVisibleItemIndex > 0 } }
+    val scope = rememberCoroutineScope()
 
-    LazyColumn(
-        modifier = Modifier.fillMaxSize()
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(paddingValues)
+            .background(MaterialTheme.colorScheme.background)
     ) {
+        when {
+            uiState.isLoading -> {
+                CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
+            }
 
+            uiState.errorMessage != null -> {
+                Text(
+                    text = uiState.errorMessage ?: "Error",
+                    modifier = Modifier.align(Alignment.Center)
+                )
+            }
+
+            else -> {
+                LazyVerticalGrid(
+                    columns = GridCells.Fixed(3),
+                    state = gridState,
+                    modifier = Modifier.fillMaxSize(),
+                    contentPadding = PaddingValues(8.dp),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    items(
+                        items = uiState.anime,
+                        key = { it.id }
+                    ) {
+                        // THE WHOLE CARD
+                        Card(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .aspectRatio(.65f)
+                                .background(MaterialTheme.colorScheme.background)
+                                .border(
+                                    1.dp,
+                                    color = Color.DarkGray,
+                                    shape = RoundedCornerShape(10)
+                                )
+                        ) {
+                            // THE CARD'S ARRANGEMENTS
+                            Column(
+                                verticalArrangement = Arrangement.SpaceBetween,
+                                modifier = Modifier
+                                    .fillMaxSize()
+                                    .background(Color.Black)
+                                    .clickable {}) {
+                                Box(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .aspectRatio(2.2f / 3f)
+                                        .weight(.7f)
+                                        .background(Color.Black)
+                                ) {
+                                    // THE IMAGE
+                                    AsyncImage(
+                                        model = it.imageUrlSmall,
+                                        contentDescription = it.title,
+                                        modifier = Modifier
+                                            .fillMaxSize()
+                                            .aspectRatio(2.2f / 3f),
+                                        contentScale = ContentScale.Crop,
+                                        onError = { println("Image error ${it.result.throwable.message}") }
+                                    )
+                                    // THE VIGNETTE
+                                    Box(
+                                        modifier = Modifier
+                                            .matchParentSize()
+                                            .background(
+                                                Brush.verticalGradient(
+                                                    colors = listOf(
+                                                        Color.Transparent,
+                                                        Color.Black.copy(alpha = 1f)
+                                                    ),
+                                                    startY = 280f
+                                                )
+                                            )
+                                    )
+                                }
+                                // THE TITLE
+                                Text(
+                                    textAlign = TextAlign.Center,
+                                    text = it.title,
+                                    modifier = Modifier
+                                        .fillMaxSize()
+                                        .padding(2.dp)
+                                        .weight(.25f),
+                                    maxLines = 2,
+                                    color = Color.LightGray,
+                                    style = MaterialTheme.typography.bodyMedium
+                                )
+                            }
+                        }
+                    }
+                }
+                // INFINITE SCROLL
+                LaunchedEffect(gridState) {
+                    snapshotFlow { gridState.layoutInfo }
+                        .collect { layoutInfo ->
+                            val total = layoutInfo.totalItemsCount
+                            val lastVisible = layoutInfo.visibleItemsInfo.lastOrNull()?.index ?: 0
+
+                            if (total > 0 && lastVisible >= total - 6) {
+                                viewModel.loadNextPage()
+                            }
+                        }
+                }
+
+                if (showScrollToTop) {
+                    FloatingActionButton(onClick = {
+                        scope.launch {
+                            gridState.animateScrollToItem(0)
+                        }
+                    },
+                        modifier = Modifier
+                            .align(Alignment.BottomEnd)
+                            .padding(16.dp),
+                        containerColor = MaterialTheme.colorScheme.primary
+                    ) {
+                        Icon(
+                            painter = painterResource(R.drawable.outline_arrow_upward_24),
+                            contentDescription = null
+                        )
+                    }
+                }
+            }
+        }
     }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -6,7 +6,7 @@ import com.ilias.otakuclub.domain.model.Anime
 fun AnimeDto.toDomainAnime(): Anime {
     val jpg = images.jpg
 
-    val small = jpg.imageUrlS ?: jpg.imageUrlL
+    val small = jpg.imageUrlL ?: jpg.imageUrlS
 
     return Anime(
         id = id,

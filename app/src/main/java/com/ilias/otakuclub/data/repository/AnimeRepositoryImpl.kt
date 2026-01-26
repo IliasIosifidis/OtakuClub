@@ -3,12 +3,13 @@ package com.ilias.otakuclub.data.repository
 import com.ilias.otakuclub.data.mapper.toDomainAnime
 import com.ilias.otakuclub.data.mapper.toDomainAnimeDetail
 import com.ilias.otakuclub.data.remote.ApiClient.jikanApi
+import com.ilias.otakuclub.data.remote.JikanApiService
 import com.ilias.otakuclub.domain.model.Anime
 import com.ilias.otakuclub.domain.model.AnimeDetails
 import com.ilias.otakuclub.domain.repository.AnimeRepository
 
 
-class AnimeRepositoryImpl : AnimeRepository {
+class AnimeRepositoryImpl(jikanApi1: JikanApiService) : AnimeRepository {
     private val api = jikanApi
 
     override suspend fun getTopAnime(page: Int): List<Anime> {

@@ -1,8 +1,9 @@
 package com.ilias.otakuclub.ui.details
 
-import androidx.compose.runtime.Composable
+import com.ilias.otakuclub.domain.model.AnimeDetails
 
-@Composable
-fun  DetailsUiState(){
-
-}
+data class DetailsUiState(
+    val isLoading: Boolean = false,
+    val animeDetails: AnimeDetails? = null,
+    val errorMessage: String? = null
+)

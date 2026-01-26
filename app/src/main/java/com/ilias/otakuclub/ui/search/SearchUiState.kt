@@ -1,8 +1,9 @@
 package com.ilias.otakuclub.ui.search
 
-import androidx.compose.runtime.Composable
+import com.ilias.otakuclub.domain.model.Anime
 
-@Composable
-fun SearchUiState(){
-
-}
+data class SearchUiState(
+    val isLoading: Boolean = false,
+    val searchResults: List<Anime> = emptyList(),
+    val errorMessage: String? = null
+)

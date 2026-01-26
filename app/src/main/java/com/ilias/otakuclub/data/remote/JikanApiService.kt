@@ -1,6 +1,5 @@
 package com.ilias.otakuclub.data.remote
 
-import com.ilias.otakuclub.data.remote.dto.AnimeDetailsDto
 import com.ilias.otakuclub.data.remote.dto.AnimeDetailsResponseDto
 import com.ilias.otakuclub.data.remote.dto.SearchAnimeResponseDto
 import com.ilias.otakuclub.data.remote.dto.TopAnimeResponseDto
