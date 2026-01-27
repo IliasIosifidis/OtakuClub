@@ -2,7 +2,6 @@ package com.ilias.otakuclub.ui.search
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.ilias.otakuclub.domain.model.Anime
 import com.ilias.otakuclub.domain.repository.AnimeRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -27,7 +26,7 @@ class SearchViewModel(
             _uiState.update { it.copy(isLoading = true, errorMessage = null) }
 
             runCatching {
-                repo.searchAnime(q)
+                repo.searchAnime(query)
             }.onSuccess { list ->
                 _uiState.update { it.copy(isLoading = false, searchResults = list) }
             }.onFailure { e ->

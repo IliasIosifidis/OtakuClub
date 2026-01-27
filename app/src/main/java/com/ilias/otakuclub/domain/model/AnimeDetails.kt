@@ -2,6 +2,7 @@ package com.ilias.otakuclub.domain.model
 
 data class AnimeDetails(
     val id: Int,
+    val title: String,
     val imageUrlLarge: String?,
     val trailer: String?,
     val titleJap: String?,
@@ -13,5 +14,6 @@ data class AnimeDetails(
     val synopsis: String?,
     val background: String?,
     val year: Int?,
-    val genres: List<String>
+    val genres: List<String>,
+    val score: Double?
 )

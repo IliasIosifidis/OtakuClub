@@ -19,7 +19,6 @@ class DetailsViewModel(
 
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true, errorMessage = null) }
-
             runCatching {
                 repo.getAnimeDetails(id)
             }.onSuccess { anime ->

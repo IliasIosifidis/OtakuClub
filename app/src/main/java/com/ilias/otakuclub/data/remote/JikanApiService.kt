@@ -1,6 +1,7 @@
 package com.ilias.otakuclub.data.remote
 
 import com.ilias.otakuclub.data.remote.dto.AnimeDetailsResponseDto
+import com.ilias.otakuclub.data.remote.dto.GenresResponseDto
 import com.ilias.otakuclub.data.remote.dto.SearchAnimeResponseDto
 import com.ilias.otakuclub.data.remote.dto.TopAnimeResponseDto
 import retrofit2.http.GET
@@ -16,13 +17,19 @@ interface JikanApiService {
     @GET("anime")
     suspend fun searchAnime(
         @Query("q") query: String,
-        @Query("page") page: Int = 1
+        @Query("page") page: Int = 1,
+        @Query("sfw") sfw: Boolean? = true,
+        @Query("genres") genres: String? = null,
     ): SearchAnimeResponseDto
 
     @GET("anime/{id}")
     suspend fun getAnimeDetails(
         @Path("id") id: Int
     ): AnimeDetailsResponseDto
+
+    @GET("genres/anime")
+    suspend fun getGenre(
+    ): GenresResponseDto
 }
 
 /*

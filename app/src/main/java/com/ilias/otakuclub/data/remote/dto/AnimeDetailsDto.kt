@@ -7,6 +7,7 @@ data class AnimeDetailsResponseDto(
 )
 
 data class AnimeDetailsDto(
+    val title: String,
     val images: AnimeImagesDto?,
     val trailer: TrailerDto? = null,
     @SerializedName("title_japanese")
@@ -18,11 +19,8 @@ data class AnimeDetailsDto(
     val synopsis: String? = null,
     val background: String? = null,
     val year: Int? = null,
-    val genres: List<GenreDto>? = null
-)
-
-data class GenreDto(
-    val name: String
+    val genres: List<GenreDto>? = null,
+    val score: Double?
 )
 
 data class TrailerDto(
