@@ -32,13 +32,22 @@ class AnimeRepositoryImpl(jikanApi1: JikanApiService) : AnimeRepository {
     override suspend fun searchAnime(
         q: String,
         page: Int,
-        genres: String?
+        genres: String?,
+        year: Int?,
+        sfw: Boolean,
+        startDate: String?,
+        endDate: String?
     ): List<Anime> {
+        val computedStart = startDate ?: year?.let { "$it-01-01" }
+        val computedEnd = endDate ?: year?.let { "$it-31-12" }
 
         val res = api.searchAnime(
             query = q.trim().takeIf { it.isNotBlank() },
             page = page,
-            genres = genres?.takeIf { it.isNotBlank() }
+            genres = genres?.takeIf { it.isNotBlank() },
+            sfw = sfw,
+            startDate = computedStart,
+            endDate = computedEnd
         )
 
         return res.data.map { it.toDomainAnime() }

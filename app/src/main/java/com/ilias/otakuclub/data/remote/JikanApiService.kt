@@ -18,8 +18,10 @@ interface JikanApiService {
     suspend fun searchAnime(
         @Query("q") query: String? = null,
         @Query("page") page: Int = 1,
-        @Query("sfw") sfw: Boolean? = true,
+        @Query("sfw") sfw: Boolean,
         @Query("genres") genres: String? = null,
+        @Query("start_date") startDate: String? = null,
+        @Query("end_date") endDate: String? = null
     ): SearchAnimeResponseDto
 
     @GET("anime/{id}")

@@ -37,6 +37,7 @@ class MainActivity : ComponentActivity() {
             var showFilter by remember { mutableStateOf(false) }
             var filteredCategory by remember { mutableStateOf<String?>(null) }
             var selectedCategory by remember { mutableStateOf<AnimeCategories?>(null) }
+            var sfwEnabled by remember { mutableStateOf(true) }
 
             val repo = remember { AnimeRepositoryImpl(ApiClient.jikanApi) }
             val searchVm: SearchViewModel = viewModel(factory = SearchViewModelFactory(repo = repo))
@@ -64,7 +65,12 @@ class MainActivity : ComponentActivity() {
                                 isSearching = true
                                 isFiltering = false
                                 filteredCategory = null
-                                searchVm.loadSearchAnime(q, genreId = null)
+                                searchVm.loadSearchAnime(
+                                    q, genreId = null,
+                                    sfw = sfwEnabled,
+                                    startDate = null,
+                                    endDate = null
+                                )
                             },
                             // filter
                             showFilter = showFilter,
@@ -76,16 +82,36 @@ class MainActivity : ComponentActivity() {
                                 isFiltering = true
                                 showFilter = false
                                 filteredCategory = cat.category
-                                searchVm.loadSearchAnime(q = searchQuery, genreId = cat.id)
+                                searchVm.loadSearchAnime(
+                                    q = searchQuery, genreId = cat.id,
+                                    sfw = sfwEnabled,
+                                    startDate = null,
+                                    endDate = null
+                                )
                             },
                             onCloseFilter = {
                                 selectedCategory = null
                                 isFiltering = false
                                 filteredCategory = null
                             },
+                            onSelectSFW = { newValue ->
+                                sfwEnabled = newValue
+
+                                val gptbs = searchQuery.isNotBlank() || selectedCategory != null
+                                if(!gptbs) return@OtakuTopBar
+
+                                searchVm.loadSearchAnime(
+                                    q = searchQuery,
+                                    genreId = selectedCategory?.id,
+                                    sfw = newValue,
+                                    startDate = null,
+                                    endDate = null
+                                )
+                            },
                             categories = categoryState.categories,
                             isFiltering = isFiltering,
                             selectedCategory = selectedCategory,
+                            sfwEnabled = sfwEnabled,
                         )
                     }
                 ) { innerPadding ->

@@ -62,16 +62,17 @@ fun HomeScreen(
 ) {
     val homeUiState by homeViewModel.uiState.collectAsState()
     val searchState by searchViewModel.uiState.collectAsState()
+
     val showingResults = isSearching || isFiltering
     val listOfAnime = if (showingResults) searchState.searchResults else homeUiState.anime // for the Grid
     val activeLoading = if (showingResults) searchState.isLoading else homeUiState.isLoading
     val activeError = if (showingResults) searchState.errorMessage else homeUiState.errorMessage
+
     val gridState = rememberLazyGridState() // for pagination
     val scope = rememberCoroutineScope() // for infinite scroll
     val showScrollToTop by remember { derivedStateOf { gridState.firstVisibleItemIndex > 0 } } // for the scroll-up arrow
     var selectedAnimeId by remember { mutableStateOf<Int?>(null) }
     var showBottomSheet by remember { mutableStateOf(false) }// for clickable
-
 
     Box(
         modifier = Modifier
@@ -80,15 +81,19 @@ fun HomeScreen(
             .background(MaterialTheme.colorScheme.background)
     ) {
         when {
-            activeLoading -> { CircularProgressIndicator(modifier = Modifier.align(Alignment.Center)) }
+            activeLoading -> {
+                CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
+            }
+
             activeError != null -> {
                 Text(
                     text = activeError,
                     modifier = Modifier.align(Alignment.Center)
                 )
             }
+
             else -> {
-                Column{
+                Column {
                     if (isFiltering) Text("Filtered category: $filteredCategory")
                     LazyVerticalGrid(
                         columns = GridCells.Fixed(3),

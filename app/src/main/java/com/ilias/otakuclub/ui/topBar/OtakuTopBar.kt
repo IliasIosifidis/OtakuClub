@@ -35,6 +35,7 @@ fun OtakuTopBar(
     onCloseClick: () -> Unit,
     onSubmit: (String) -> Unit,
 // Filter functionality
+    //filter
     isFiltering: Boolean,
     showFilter: Boolean,
     onFilterClick: () -> Unit,
@@ -42,7 +43,10 @@ fun OtakuTopBar(
     onSelectCategory: (AnimeCategories) -> Unit,
     selectedCategory: AnimeCategories?,
     categories: List<AnimeCategories>,
-    onCloseFilter: () -> Unit
+    onCloseFilter: () -> Unit,
+    //sfw
+    onSelectSFW: (Boolean) -> Unit,
+    sfwEnabled: Boolean
 ) {
     TopAppBar(
         modifier = Modifier.height(85.dp),
@@ -92,7 +96,9 @@ fun OtakuTopBar(
                     onDismissFilter()
                 },
                 onClearFilter = onCloseFilter,
-                selectedCategory = selectedCategory
+                selectedCategory = selectedCategory,
+                onSelectSFW = onSelectSFW,
+                sfwEnabled = sfwEnabled
             )
         }
     )

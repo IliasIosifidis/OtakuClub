@@ -1,5 +1,6 @@
 package com.ilias.otakuclub.ui.search
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ilias.otakuclub.domain.repository.AnimeRepository
@@ -16,11 +17,14 @@ class SearchViewModel(
     val uiState : StateFlow<SearchUiState> = _uiState.asStateFlow()
     val currentPage = 1
 
-    fun loadSearchAnime(q: String, genreId: Int?){
+
+    fun loadSearchAnime(q: String, genreId: Int?, sfw : Boolean, startDate : String?, endDate : String?){
+
         viewModelScope.launch {
             val query = q.trim()
+            Log.d("API call ----->", "search: q=$q genre=$genreId sfw=$sfw")
 
-            if (query.isEmpty() && genreId == null){
+            if (query.isEmpty() && genreId == null && startDate == null && endDate == null){
                 _uiState.update { it.copy(isLoading = false, searchResults = emptyList(), errorMessage = null) }
                 return@launch
             }
@@ -29,7 +33,11 @@ class SearchViewModel(
                 repo.searchAnime(
                     q = query,
                     page = currentPage,
-                    genres = genreId?.toString())
+                    genres = genreId?.toString(),
+                    sfw = sfw,
+                    startDate = startDate,
+                    endDate = endDate)
+
             }.onSuccess { list ->
                 _uiState.update { it.copy(isLoading = false, searchResults = list) }
             }.onFailure { e ->
