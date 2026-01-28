@@ -1,14 +1,14 @@
-package com.ilias.otakuclub.ui.details
+package com.ilias.otakuclub.ui.category
 
 import com.ilias.otakuclub.domain.repository.AnimeRepository
 
-class DetailsViewModelFactory(
+class CategoryViewModelFactory(
     private val repo: AnimeRepository
-) : androidx.lifecycle.ViewModelProvider.Factory {
+): androidx.lifecycle.ViewModelProvider.Factory {
     override fun <T: androidx.lifecycle.ViewModel> create(modelClass: Class<T>): T {
-        if (modelClass.isAssignableFrom(DetailsViewModel::class.java)){
+        if (modelClass.isAssignableFrom(CategoryViewModel::class.java)){
             @Suppress("UNCHECKED_CAST")
-            return DetailsViewModel(repo) as T
+            return CategoryViewModel(repo) as T
         }
         throw IllegalArgumentException("Unknown ViewModel class: $modelClass")
     }

@@ -1,4 +1,4 @@
-package com.ilias.otakuclub.ui.home
+package com.ilias.otakuclub.ui.details
 
 import android.content.Intent
 import androidx.compose.foundation.layout.Arrangement
@@ -40,8 +40,6 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import coil3.compose.AsyncImage
 import com.ilias.otakuclub.R
 import com.ilias.otakuclub.domain.repository.AnimeRepository
-import com.ilias.otakuclub.ui.details.DetailsViewModel
-import com.ilias.otakuclub.ui.details.DetailsViewModelFactory
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

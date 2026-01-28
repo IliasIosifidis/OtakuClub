@@ -14,19 +14,22 @@ class SearchViewModel(
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(SearchUiState())
     val uiState : StateFlow<SearchUiState> = _uiState.asStateFlow()
+    val currentPage = 1
 
-    fun loadSearchAnime(q: String){
-
+    fun loadSearchAnime(q: String, genreId: Int?){
         viewModelScope.launch {
             val query = q.trim()
-            if (query.isEmpty()){
+
+            if (query.isEmpty() && genreId == null){
                 _uiState.update { it.copy(isLoading = false, searchResults = emptyList(), errorMessage = null) }
                 return@launch
             }
             _uiState.update { it.copy(isLoading = true, errorMessage = null) }
-
             runCatching {
-                repo.searchAnime(query)
+                repo.searchAnime(
+                    q = query,
+                    page = currentPage,
+                    genres = genreId?.toString())
             }.onSuccess { list ->
                 _uiState.update { it.copy(isLoading = false, searchResults = list) }
             }.onFailure { e ->

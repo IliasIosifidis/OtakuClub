@@ -19,25 +19,33 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import com.ilias.otakuclub.R
+import com.ilias.otakuclub.domain.model.AnimeCategories
+import com.ilias.otakuclub.ui.search.FilterAction
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun OtakuTopBar(
     title: String = "Otaku",
-    modifier: Modifier,
     actions: @Composable RowScope.() -> Unit = {},
-    // Search functionality
+// Search functionality
     isSearching: Boolean,
     query: String,
     onQueryChange: (String) -> Unit,
     onSearchClick: () -> Unit,
     onCloseClick: () -> Unit,
     onSubmit: (String) -> Unit,
-    // Filter functionality
+// Filter functionality
+    isFiltering: Boolean,
+    showFilter: Boolean,
     onFilterClick: () -> Unit,
+    onDismissFilter: () -> Unit,
+    onSelectCategory: (AnimeCategories) -> Unit,
+    selectedCategory: AnimeCategories?,
+    categories: List<AnimeCategories>,
+    onCloseFilter: () -> Unit
 ) {
     TopAppBar(
-        modifier = modifier.height(85.dp),
+        modifier = Modifier.height(85.dp),
         colors = TopAppBarDefaults.topAppBarColors(
             containerColor = Color.DarkGray,
             actionIconContentColor = Color.LightGray,
@@ -49,14 +57,13 @@ fun OtakuTopBar(
             // Search
             if (isSearching) {
                 TextField(
-                    modifier = modifier.width(200.dp),
+                    modifier = Modifier.width(200.dp),
                     value = query,
                     onValueChange = onQueryChange,
                     placeholder = { Text("Search...") },
                     singleLine = true,
                     keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
-                    keyboardActions = KeyboardActions(onSearch = { onSubmit(query) }
-                    )
+                    keyboardActions = KeyboardActions(onSearch = { onSubmit(query) })
                 )
             }
             if (isSearching) {
@@ -75,12 +82,18 @@ fun OtakuTopBar(
                 }
             }
             // Filter
-            IconButton(onClick = onFilterClick) {
-                Icon(
-                    painter = painterResource(R.drawable.outline_filter_alt_24),
-                    contentDescription = "filter"
-                )
-            }
+            FilterAction(
+                showFilter = showFilter,
+                onFilterClick = onFilterClick,
+                onDismissFilter = onDismissFilter,
+                categories = categories,
+                onSelectedCategory = { cat ->
+                    onSelectCategory(cat)
+                    onDismissFilter()
+                },
+                onClearFilter = onCloseFilter,
+                selectedCategory = selectedCategory
+            )
         }
     )
 }

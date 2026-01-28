@@ -12,7 +12,7 @@ object ApiClient {
 
     // That's for logging each step of the API call in Logcat
     private val loggingInterceptor = HttpLoggingInterceptor().apply {
-        level = HttpLoggingInterceptor.Level.BODY
+        level = HttpLoggingInterceptor.Level.HEADERS
     }
 
     private val okHttpClient: OkHttpClient = OkHttpClient.Builder()

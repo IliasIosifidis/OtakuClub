@@ -44,6 +44,7 @@ import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 import com.ilias.otakuclub.R
 import com.ilias.otakuclub.data.repository.AnimeRepositoryImpl
+import com.ilias.otakuclub.ui.details.DetailsBottomSheet
 import com.ilias.otakuclub.ui.search.SearchViewModel
 import kotlinx.coroutines.launch
 
@@ -54,18 +55,23 @@ fun HomeScreen(
     paddingValues: PaddingValues,
     homeViewModel: HomeViewModel,
     searchViewModel: SearchViewModel,
-    query: String,
     isSearching: Boolean,
-    repo: AnimeRepositoryImpl
+    isFiltering: Boolean,
+    repo: AnimeRepositoryImpl,
+    filteredCategory: String?
 ) {
     val homeUiState by homeViewModel.uiState.collectAsState()
     val searchState by searchViewModel.uiState.collectAsState()
-    val listOfAnime = if (isSearching) searchState.searchResults else homeUiState.anime // for the Grid
+    val showingResults = isSearching || isFiltering
+    val listOfAnime = if (showingResults) searchState.searchResults else homeUiState.anime // for the Grid
+    val activeLoading = if (showingResults) searchState.isLoading else homeUiState.isLoading
+    val activeError = if (showingResults) searchState.errorMessage else homeUiState.errorMessage
     val gridState = rememberLazyGridState() // for pagination
-    val showScrollToTop by remember { derivedStateOf { gridState.firstVisibleItemIndex > 0 } } // for the scroll-up arrow
     val scope = rememberCoroutineScope() // for infinite scroll
+    val showScrollToTop by remember { derivedStateOf { gridState.firstVisibleItemIndex > 0 } } // for the scroll-up arrow
     var selectedAnimeId by remember { mutableStateOf<Int?>(null) }
     var showBottomSheet by remember { mutableStateOf(false) }// for clickable
+
 
     Box(
         modifier = Modifier
@@ -74,97 +80,96 @@ fun HomeScreen(
             .background(MaterialTheme.colorScheme.background)
     ) {
         when {
-            homeUiState.isLoading -> {
-                CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
-            }
-
-            homeUiState.errorMessage != null -> {
+            activeLoading -> { CircularProgressIndicator(modifier = Modifier.align(Alignment.Center)) }
+            activeError != null -> {
                 Text(
-                    text = homeUiState.errorMessage ?: "Error",
+                    text = activeError,
                     modifier = Modifier.align(Alignment.Center)
                 )
             }
-
             else -> {
-                LazyVerticalGrid(
-                    columns = GridCells.Fixed(3),
-                    state = gridState,
-                    modifier = Modifier.fillMaxSize(),
-                    contentPadding = PaddingValues(8.dp),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp),
-                    verticalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    items(
-                        items = listOfAnime,
-                        key = { it.id }
+                Column{
+                    if (isFiltering) Text("Filtered category: $filteredCategory")
+                    LazyVerticalGrid(
+                        columns = GridCells.Fixed(3),
+                        state = gridState,
+                        modifier = Modifier.fillMaxSize(),
+                        contentPadding = PaddingValues(8.dp),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        verticalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
-                        // THE WHOLE CARD
-                        Card(
-                            modifier = Modifier
-                                .fillMaxSize()
-                                .clickable {
-                                    showBottomSheet = true
-                                    selectedAnimeId = it.id
-                                }
-                                .aspectRatio(.65f)
-                                .background(MaterialTheme.colorScheme.background)
-                                .border(
-                                    1.dp,
-                                    color = Color.DarkGray,
-                                    shape = RoundedCornerShape(10)
-                                )
+                        items(
+                            items = listOfAnime,
+                            key = { it.id }
                         ) {
-                            // THE CARD'S ARRANGEMENTS
-                            Column(
-                                verticalArrangement = Arrangement.SpaceBetween,
+                            // THE WHOLE CARD
+                            Card(
                                 modifier = Modifier
                                     .fillMaxSize()
-                                    .background(Color.Black)
+                                    .clickable {
+                                        showBottomSheet = true
+                                        selectedAnimeId = it.id
+                                    }
+                                    .aspectRatio(.65f)
+                                    .background(MaterialTheme.colorScheme.background)
+                                    .border(
+                                        1.dp,
+                                        color = Color.DarkGray,
+                                        shape = RoundedCornerShape(10)
+                                    )
                             ) {
-                                Box(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .aspectRatio(2.2f / 3f)
-                                        .weight(.7f)
-                                        .background(Color.Black)
-                                ) {
-                                    // THE IMAGE
-                                    AsyncImage(
-                                        model = it.imageUrlSmall,
-                                        contentDescription = it.title,
-                                        modifier = Modifier
-                                            .fillMaxSize()
-                                            .aspectRatio(2.2f / 3f),
-                                        contentScale = ContentScale.Crop,
-                                        onError = { println("Image error") }
-                                    )
-                                    // THE VIGNETTE
-                                    Box(
-                                        modifier = Modifier
-                                            .matchParentSize()
-                                            .background(
-                                                Brush.verticalGradient(
-                                                    colors = listOf(
-                                                        Color.Transparent,
-                                                        Color.Black.copy(alpha = 1f)
-                                                    ),
-                                                    startY = 280f
-                                                )
-                                            )
-                                    )
-                                }
-                                // THE TITLE
-                                Text(
-                                    textAlign = TextAlign.Center,
-                                    text = it.title,
+                                // THE CARD'S ARRANGEMENTS
+                                Column(
+                                    verticalArrangement = Arrangement.SpaceBetween,
                                     modifier = Modifier
                                         .fillMaxSize()
-                                        .padding(2.dp)
-                                        .weight(.25f),
-                                    maxLines = 2,
-                                    color = Color.LightGray,
-                                    style = MaterialTheme.typography.bodyMedium
-                                )
+                                        .background(Color.Black)
+                                ) {
+                                    Box(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .aspectRatio(2.2f / 3f)
+                                            .weight(.7f)
+                                            .background(Color.Black)
+                                    ) {
+                                        // THE IMAGE
+                                        AsyncImage(
+                                            model = it.imageUrlSmall,
+                                            contentDescription = it.title,
+                                            modifier = Modifier
+                                                .fillMaxSize()
+                                                .aspectRatio(2.2f / 3f),
+                                            contentScale = ContentScale.Crop,
+                                            onError = { println("Image error") }
+                                        )
+                                        // THE VIGNETTE
+                                        Box(
+                                            modifier = Modifier
+                                                .matchParentSize()
+                                                .background(
+                                                    Brush.verticalGradient(
+                                                        colors = listOf(
+                                                            Color.Transparent,
+                                                            Color.Black.copy(alpha = 1f)
+                                                        ),
+                                                        startY = 280f
+                                                    )
+                                                )
+                                        )
+                                    }
+                                    // THE TITLE
+                                    Text(
+                                        textAlign = TextAlign.Center,
+                                        text = it.title,
+                                        modifier = Modifier
+                                            .fillMaxSize()
+                                            .padding(2.dp)
+                                            .weight(.25f),
+                                        maxLines = 2,
+                                        color = Color.LightGray,
+                                        style = MaterialTheme.typography.bodyMedium
+                                    )
+                                }
                             }
                         }
                     }
@@ -213,30 +218,3 @@ fun HomeScreen(
         }
     }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
