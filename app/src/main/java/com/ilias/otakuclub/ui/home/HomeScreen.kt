@@ -1,5 +1,6 @@
 package com.ilias.otakuclub.ui.home
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -64,7 +65,8 @@ fun HomeScreen(
     val searchState by searchViewModel.uiState.collectAsState()
 
     val showingResults = isSearching || isFiltering
-    val listOfAnime = if (showingResults) searchState.searchResults else homeUiState.anime // for the Grid
+    val listOfAnime =
+        if (showingResults) searchState.searchResults else homeUiState.anime // for the Grid
     val activeLoading = if (showingResults) searchState.isLoading else homeUiState.isLoading
     val activeError = if (showingResults) searchState.errorMessage else homeUiState.errorMessage
 
@@ -78,8 +80,20 @@ fun HomeScreen(
         modifier = Modifier
             .fillMaxSize()
             .padding(paddingValues)
-            .background(MaterialTheme.colorScheme.background)
     ) {
+        //BACKGROUND IMAGE
+        Image(
+            painter = painterResource(R.drawable.background),
+            contentDescription = "background",
+            contentScale = ContentScale.Crop,
+            modifier = Modifier.matchParentSize()
+        )
+        // dark overlay
+        Box(
+            modifier = Modifier
+                .matchParentSize()
+                .background(Color(0x80000000))
+        )
         when {
             activeLoading -> {
                 CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
@@ -116,7 +130,7 @@ fun HomeScreen(
                                         selectedAnimeId = it.id
                                     }
                                     .aspectRatio(.65f)
-                                    .background(MaterialTheme.colorScheme.background)
+                                    .background(Color.Transparent)
                                     .border(
                                         1.dp,
                                         color = Color.DarkGray,

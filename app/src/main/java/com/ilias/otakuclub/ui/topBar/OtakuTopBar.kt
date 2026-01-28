@@ -2,6 +2,7 @@ package com.ilias.otakuclub.ui.topBar
 
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
@@ -25,7 +26,7 @@ import com.ilias.otakuclub.ui.search.FilterAction
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun OtakuTopBar(
-    title: String = "Otaku",
+    title: String = "",
     actions: @Composable RowScope.() -> Unit = {},
 // Search functionality
     isSearching: Boolean,
@@ -51,11 +52,25 @@ fun OtakuTopBar(
     TopAppBar(
         modifier = Modifier.height(85.dp),
         colors = TopAppBarDefaults.topAppBarColors(
-            containerColor = Color.DarkGray,
+            containerColor = Color(0xFF5918B4),
             actionIconContentColor = Color.LightGray,
         ),
         scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(),
+
         title = { Text(title) },
+        // LOGO
+        navigationIcon = {
+            IconButton(
+                onClick = { },
+                modifier = Modifier.size(100.dp)
+            ) {
+                Icon(
+                    painterResource(R.drawable.logo_transparent),
+                    contentDescription = "logo",
+                    tint = Color.Unspecified,
+                )
+            }
+        },
 
         actions = {
             // Search
