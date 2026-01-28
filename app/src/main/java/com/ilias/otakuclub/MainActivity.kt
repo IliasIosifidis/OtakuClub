@@ -97,8 +97,7 @@ class MainActivity : ComponentActivity() {
                             onSelectSFW = { newValue ->
                                 sfwEnabled = newValue
 
-                                val gptbs = searchQuery.isNotBlank() || selectedCategory != null
-                                if(!gptbs) return@OtakuTopBar
+                                if(!searchQuery.isBlank() && selectedCategory == null) return@OtakuTopBar
 
                                 searchVm.loadSearchAnime(
                                     q = searchQuery,
